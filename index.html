@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quick Math Tap</title>
+  <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/128/3813/3813710.png" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      color: #333;
+    }
+    #game {
+      margin-top: 60px;
+    }
+    #question {
+      font-size: 2rem;
+      margin: 20px 0;
+    }
+    .answers {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+    .answerBtn {
+      background: #ffffff;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      padding: 15px 30px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .answerBtn:hover {
+      background-color: #eee;
+    }
+    #score {
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+    #timer {
+      font-size: 1.2rem;
+      margin-top: 10px;
+    }
+    #gameOver {
+      display: none;
+      font-size: 2rem;
+      margin-top: 30px;
+      color: red;
+    }
+    #startBtn {
+      margin-top: 40px;
+      padding: 12px 28px;
+      font-size: 1.3rem;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <h1>Quick Math Tap</h1>
+    <div id="question">Press Start</div>
+    <div class="answers" id="answers"></div>
+    <div id="score">Score: 0</div>
+    <div id="timer">Time Left: 5s</div>
+    <div id="gameOver">Game Over!</div>
+    <button id="startBtn">Start Game</button>
+  </div>
+
+  <script>
+    const questionEl = document.getElementById("question");
+    const answersEl = document.getElementById("answers");
+    const scoreEl = document.getElementById("score");
+    const timerEl = document.getElementById("timer");
+    const gameOverEl = document.getElementById("gameOver");
+    const startBtn = document.getElementById("startBtn");
+
+    let correctAnswer = 0;
+    let score = 0;
+    let timeLeft = 5;
+    let timerInterval;
+
+    function generateQuestion() {
+      const a = Math.floor(Math.random() * 10);
+      const b = Math.floor(Math.random() * 10);
+      correctAnswer = a + b;
+      questionEl.textContent = `What is ${a} + ${b}?`;
+
+      const answers = [correctAnswer];
+      while (answers.length < 4) {
+        const fake = Math.floor(Math.random() * 20);
+        if (!answers.includes(fake)) answers.push(fake);
+      }
+
+      answers.sort(() => Math.random() - 0.5);
+
+      answersEl.innerHTML = '';
+      answers.forEach(ans => {
+        const btn = document.createElement("button");
+        btn.className = "answerBtn";
+        btn.textContent = ans;
+        btn.onclick = () => handleAnswer(ans);
+        answersEl.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(ans) {
+      if (ans === correctAnswer) {
+        score++;
+        scoreEl.textContent = `Score: ${score}`;
+        resetTimer();
+        generateQuestion();
+      } else {
+        endGame();
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timeLeft = 5;
+      timerEl.textContent = `Time Left: ${timeLeft}s`;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `Time Left: ${timeLeft}s`;
+        if (timeLeft <= 0) endGame();
+      }, 1000);
+    }
+
+    function endGame() {
+      clearInterval(timerInterval);
+      questionEl.textContent = "Game Over!";
+      gameOverEl.style.display = "block";
+      answersEl.innerHTML = '';
+    }
+
+    startBtn.onclick = () => {
+      score = 0;
+      scoreEl.textContent = "Score: 0";
+      gameOverEl.style.display = "none";
+      generateQuestion();
+      resetTimer();
+    };
+  </script>
+</body>
+</html>
